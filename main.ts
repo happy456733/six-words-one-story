@@ -1,7 +1,7 @@
 // Six Words, One Story — make.fun entry
 // Writes one complete six-word story to entry.txt.
 // Deterministic, stdlib only, no network, no files outside this repo.
-import { mkdirSync, writeFileSync } from "node:fs";
+import { mkdirSync, readFileSync, writeFileSync } from "node:fs";
 import { join } from "node:path";
 
 // The story: a whole life in six words. She waited a lifetime
@@ -22,7 +22,13 @@ function main(): void {
   }
   const outDir = process.env.MAKEFUN_OUTPUT_DIR ?? "/output";
   mkdirSync(outDir, { recursive: true });
-  writeFileSync(join(outDir, "entry.txt"), STORY + "\n", "utf8");
+  const outPath = join(outDir, "entry.txt");
+  writeFileSync(outPath, STORY + "\n", "utf8");
+  // Read back what was written: the file must hold exactly the story.
+  const written = readFileSync(outPath, "utf8");
+  if (written.trim() !== STORY) {
+    throw new Error("entry.txt does not hold the story");
+  }
 }
 
 main();
